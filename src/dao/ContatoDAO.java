@@ -12,9 +12,15 @@ import modelo.Contato;
 
 public class ContatoDAO {
 	
-	public static void salvarContatos(List<Contato> contatos) {
+	private String caminhoArquivo;
 
-	    try (PrintWriter pw = new PrintWriter(new FileWriter("contatos.txt"))) {
+	public ContatoDAO(String caminhoArquivo) {
+		this.caminhoArquivo = caminhoArquivo;
+	}
+
+	public boolean salvarContatos(List<Contato> contatos) {
+
+	    try (PrintWriter pw = new PrintWriter(new FileWriter(caminhoArquivo))) {
 
 	        for (Contato contato : contatos) {
 
@@ -26,17 +32,19 @@ public class ContatoDAO {
 	        }
 
 	        System.out.println("Contatos salvos com sucesso!");
+	        return true;
 
 	    } catch (IOException e) {
 
 	        System.out.println("Erro ao salvar os contatos!");
 	        System.out.println("Motivo: " + e.getMessage());
+	        return false;
 	    }
 	}
 	
-	public static void carregarContatos(List<Contato> contatos) {
+	public void carregarContatos(List<Contato> contatos) {
 
-	    File arquivo = new File("contatos.txt");
+	    File arquivo = new File(caminhoArquivo);
 
 	    if (!arquivo.exists()) return;
 
@@ -49,7 +57,8 @@ public class ContatoDAO {
 	        	// Mantém colunas vazias para não estourar o índice do array
                 String[] dados = linha.split(";", -1);
 
-               
+                // 1. Verifica se a estrutura tem exatamente 3 colunas
+                // 2. Garante que nenhuma das 3 colunas está vazia ou cheia de espaços
                 if (dados.length == 3 
                         && !dados[0].trim().isEmpty() 
                         && !dados[1].trim().isEmpty() 
